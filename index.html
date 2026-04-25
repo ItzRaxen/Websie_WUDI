@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wudi. | Organize Your Tasks, Together or Alone.</title>
+    <meta name="description"
+        content="WUDI helps you manage daily tasks, set priorities, and collaborate with your team — all in one clean, simple app.">
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- WUDI Loader Overlay -->
+    <div id="wudi-loader">
+        <style>
+            #wudi-loader {
+                --loader-bg: #1C1B2E;
+                --loader-cream: #F5EFE8;
+                --loader-red: #D94040;
+                --loader-beige: #EDE8E1;
+                --loader-gray: rgba(245,239,232,0.3);
+                
+                position: fixed;
+                top: 0; left: 0; width: 100vw; height: 100vh;
+                z-index: 99999;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                pointer-events: all;
+            }
+            
+            /* Ambient background */
+            #wudi-loader .loader-ambient {
+                position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+                z-index: 1; pointer-events: none;
+            }
+            #wudi-loader .loader-noise {
+                position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+                opacity: 0.03; pointer-events: none; mix-blend-mode: overlay;
+            }
+            #wudi-loader .loader-gradient {
+                position: absolute; top: -20%; right: -10%; width: 1200px; height: 1200px;
+                background: radial-gradient(circle, rgba(217,64,64,0.07) 0%, transparent 60%);
+                border-radius: 50%;
+                animation: loaderDrift 6s ease-in-out infinite alternate;
+            }
+            @keyframes loaderDrift {
+                0% { transform: translate(0, 0); }
+                33% { transform: translate(30px, -20px); }
+                66% { transform: translate(-20px, 10px); }
+                100% { transform: translate(0, 0); }
+            }
+            
+            #wudi-loader .corner-accents {
+                position: absolute; top: 40px; left: 40px; width: 60px; height: 60px;
+                border-top: 1px solid rgba(245,239,232,0.06); border-left: 1px solid rgba(245,239,232,0.06);
+            }
+            #wudi-loader .corner-accents-br {
+                position: absolute; bottom: 40px; right: 40px; width: 60px; height: 60px;
+                border-bottom: 1px solid rgba(245,239,232,0.06); border-right: 1px solid rgba(245,239,232,0.06);
+            }
+
+            /* Split Panels */
+            #wudi-loader .panel-top, #wudi-loader .panel-bottom {
+                position: absolute; left: 0; width: 100%; height: 50vh;
+                background: var(--loader-bg); z-index: 2;
+                transition: transform 0.6s cubic-bezier(0.76, 0, 0.24, 1);
+            }
+            #wudi-loader .panel-top { top: 0; transform: translateY(-100%); }
+            #wudi-loader .panel-bottom { bottom: 0; transform: translateY(100%); }
+            
+            /* Loader Content container */
+            #wudi-loader .loader-content {
+                position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center;
+                transition: transform 0.7s cubic-bezier(0.55, 0, 1, 0.45), opacity 0.7s cubic-bezier(0.55, 0, 1, 0.45), filter 0.7s ease;
+            }
+            
+            /* Logo */
+            #wudi-loader .loader-logo {
+                display: flex; align-items: baseline; justify-content: center;
+                font-family: 'Inter', sans-serif; font-weight: 800; font-size: 96px;
+                letter-spacing: -4px; color: var(--loader-cream);
+                transition: transform 0.6s ease-in-out;
+            }
+            @media (max-width: 768px) { #wudi-loader .loader-logo { font-size: 64px; } }
+            
+            #wudi-loader .logo-char {
+                opacity: 0; transform: translateY(40px) scale(0.8); filter: blur(8px);
+                transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+            }
+            #wudi-loader .logo-dot {
+                color: var(--loader-red); transform: scale(0); opacity: 0;
+                transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.6s ease, opacity 0.1s;
+                border-radius: 50%;
+            }
+            
+            /* Tagline */
+            #wudi-loader .loader-tagline {
+                font-family: 'Inter', sans-serif; font-size: 14px; text-transform: uppercase;
+                letter-spacing: 12px; color: rgba(245,239,232,0.5);
+                margin-top: 8px; opacity: 0;
+                transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+            }
+            
+            /* Progress Bar */
+            #wudi-loader .loader-progress-wrap {
+                margin-top: 32px; width: 180px; height: 1.5px;
+                background: rgba(245,239,232,0.1); border-radius: 2px;
+                position: relative; overflow: visible; opacity: 0;
+                transition: opacity 0.2s ease;
+            }
+            @media (max-width: 768px) { #wudi-loader .loader-progress-wrap { width: 120px; } }
+            #wudi-loader .loader-progress-fill {
+                position: absolute; top: 0; left: 0; height: 100%; width: 0%;
+                background: linear-gradient(90deg, var(--loader-red), var(--loader-cream));
+                border-radius: 2px;
+                transition: width 0.1s linear; /* updated by JS */
+            }
+            #wudi-loader .loader-progress-glow {
+                position: absolute; top: 50%; right: 0; width: 2px; height: 2px;
+                transform: translate(50%, -50%);
+                box-shadow: 0 0 8px 2px rgba(217,64,64,0.8); border-radius: 50%;
+            }
+            #wudi-loader .loader-progress-glow-bg {
+                position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                width: 0; height: 0; background: radial-gradient(circle, rgba(217,64,64,0.15) 0%, transparent 70%);
+                border-radius: 50%; opacity: 0; transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+                pointer-events: none;
+            }
+            
+            /* Floating Task Cards */
+            #wudi-loader .loader-card {
+                position: absolute; background: rgba(237,232,225,0.06); border: 1px solid rgba(237,232,225,0.08);
+                border-radius: 12px; opacity: 0; transition: opacity 0.8s ease, transform 0.7s ease;
+                display: flex; flex-direction: column; justify-content: center; padding: 0 12px; gap: 4px;
+            }
+            #wudi-loader .loader-card .c-dot { width: 4px; height: 4px; background: var(--loader-red); border-radius: 50%; margin-bottom: 2px; }
+            #wudi-loader .loader-card .c-line { height: 2px; background: rgba(245,239,232,0.15); border-radius: 1px; }
+            #wudi-loader .loader-card .c-line.l1 { width: 60%; }
+            #wudi-loader .loader-card .c-line.l2 { width: 40%; }
+            
+            #wudi-loader .lc-1 { width: 120px; height: 48px; top: 50%; left: 50%; margin: -120px 0 0 -180px; transform: rotate(-8deg); animation: lc1Float 3.5s ease-in-out infinite; }
+            #wudi-loader .lc-2 { width: 100px; height: 40px; top: 50%; left: 50%; margin: 20px 0 0 140px; transform: rotate(5deg); animation: lc2Float 4s ease-in-out infinite; }
+            #wudi-loader .lc-3 { width: 80px; height: 32px; top: 50%; left: 50%; margin: 90px 0 0 -100px; transform: rotate(-3deg); animation: lc3Float 5s ease-in-out infinite; }
+            @media (max-width: 768px) { #wudi-loader .loader-card { display: none; } }
+            
+            @keyframes lc1Float { 0%, 100% { margin-top: -120px; } 50% { margin-top: -128px; } }
+            @keyframes lc2Float { 0%, 100% { margin-top: 20px; } 50% { margin-top: 28px; } }
+            @keyframes lc3Float { 0%, 100% { margin-top: 90px; } 50% { margin-top: 84px; } }
+            
+            /* Ripple Circles */
+            #wudi-loader .loader-ripple {
+                position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                border-radius: 50%; pointer-events: none; opacity: 0; width: 0; height: 0;
+            }
+            
+            /* Flash */
+            #wudi-loader .loader-flash {
+                position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+                background: #fff; z-index: 20; pointer-events: none; opacity: 0;
+                transition: opacity 0.25s ease;
+            }
+            
+            /* Reduced Motion */
+            @media (prefers-reduced-motion: reduce) {
+                #wudi-loader .logo-char, #wudi-loader .logo-dot, #wudi-loader .loader-tagline, 
+                #wudi-loader .loader-progress-wrap, #wudi-loader .loader-content, 
+                #wudi-loader .panel-top, #wudi-loader .panel-bottom {
+                    transition: opacity 0.5s ease !important;
+                    transform: none !important; filter: none !important;
+                }
+                #wudi-loader .loader-gradient, #wudi-loader .loader-card, #wudi-loader .loader-ripple, #wudi-loader .loader-flash {
+                    display: none !important;
+                }
+            }
+        </style>
+
+        <div class="loader-ambient">
+            <svg class="loader-noise" xmlns="http://www.w3.org/2000/svg">
+                <filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/></filter>
+                <rect width="100%" height="100%" filter="url(#noiseFilter)" />
+            </svg>
+            <div class="loader-gradient"></div>
+            <div class="corner-accents"></div>
+            <div class="corner-accents-br"></div>
+        </div>
+
+        <div class="panel-top" id="wl-pt"></div>
+        <div class="panel-bottom" id="wl-pb"></div>
+
+        <div class="loader-ripple" id="wl-r1"></div>
+        <div class="loader-ripple" id="wl-r2"></div>
+        <div class="loader-ripple" id="wl-r3"></div>
+        
+        <div class="loader-card lc-1"><div class="c-dot"></div><div class="c-line l1"></div><div class="c-line l2"></div></div>
+        <div class="loader-card lc-2"><div class="c-dot"></div><div class="c-line l1"></div><div class="c-line l2"></div></div>
+        <div class="loader-card lc-3"><div class="c-dot"></div><div class="c-line l1"></div><div class="c-line l2"></div></div>
+
+        <div class="loader-content" id="wl-content">
+            <div class="loader-logo" id="wl-logo">
+                <span class="logo-char" id="wl-c1">W</span>
+                <span class="logo-char" id="wl-c2">u</span>
+                <span class="logo-char" id="wl-c3">d</span>
+                <span class="logo-char" id="wl-c4">i</span>
+                <span class="logo-dot" id="wl-dot">.</span>
+            </div>
+            <div class="loader-tagline" id="wl-tag">What U Do It</div>
+            <div class="loader-progress-wrap" id="wl-pwrap">
+                <div class="loader-progress-fill" id="wl-pfill">
+                    <div class="loader-progress-glow"></div>
+                </div>
+                <div class="loader-progress-glow-bg" id="wl-pglow"></div>
+            </div>
+        </div>
+        
+        <div class="loader-flash" id="wl-flash"></div>
+
+        <script>
+            (function() {
+                const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                const isVisited = sessionStorage.getItem('wudi-visited') === 'true';
+                
+                const loader = document.getElementById('wudi-loader');
+                const pTop = document.getElementById('wl-pt');
+                const pBot = document.getElementById('wl-pb');
+                const content = document.getElementById('wl-content');
+                const chars = [document.getElementById('wl-c1'), document.getElementById('wl-c2'), document.getElementById('wl-c3'), document.getElementById('wl-c4')];
+                const dot = document.getElementById('wl-dot');
+                const logo = document.getElementById('wl-logo');
+                const tag = document.getElementById('wl-tag');
+                const pwrap = document.getElementById('wl-pwrap');
+                const pfill = document.getElementById('wl-pfill');
+                const pglow = document.getElementById('wl-pglow');
+                const flash = document.getElementById('wl-flash');
+                const cards = document.querySelectorAll('#wudi-loader .loader-card');
+                const ripples = [document.getElementById('wl-r1'), document.getElementById('wl-r2'), document.getElementById('wl-r3')];
+                
+                document.body.style.overflow = 'hidden'; // lock scroll
+                
+                const t = (fn, delay) => setTimeout(fn, delay);
+                
+                function endSequence() {
+                    t(() => {
+                        loader.style.pointerEvents = 'none';
+                        loader.style.display = 'none';
+                        document.body.style.overflow = '';
+                        document.body.classList.add('wudi-loaded');
+                        sessionStorage.setItem('wudi-visited', 'true');
+                        document.body.dispatchEvent(new Event('wudi-loaded-event'));
+                    }, 3200);
+                }
+
+                if (isReduced || isVisited) {
+                    // Quick entrance
+                    t(() => { pTop.style.transform = 'translateY(0)'; pBot.style.transform = 'translateY(0)'; }, 0);
+                    t(() => { 
+                        chars.forEach(c => { c.style.opacity = '1'; c.style.transform = 'translateY(0) scale(1)'; c.style.filter = 'blur(0)'; });
+                        dot.style.opacity = '1'; dot.style.transform = 'scale(1)'; 
+                    }, 100);
+                    
+                    // Quick exit
+                    t(() => { content.style.opacity = '0'; }, 800);
+                    t(() => { pTop.style.transform = 'translateY(-100%)'; pBot.style.transform = 'translateY(100%)'; }, 900);
+                    
+                    t(() => {
+                        loader.style.pointerEvents = 'none';
+                        loader.style.display = 'none';
+                        document.body.style.overflow = '';
+                        document.body.classList.add('wudi-loaded');
+                        sessionStorage.setItem('wudi-visited', 'true');
+                        document.body.dispatchEvent(new Event('wudi-loaded-event'));
+                    }, 1500);
+                    return;
+                }
+                
+                // PHASE 1: BACKGROUND REVEAL
+                t(() => { pTop.style.transform = 'translateY(0)'; pBot.style.transform = 'translateY(0)'; }, 0);
+                
+                // PHASE 2: LOGO BUILD
+                chars.forEach((c, i) => {
+                    t(() => { c.style.opacity = '1'; c.style.transform = 'translateY(0) scale(1)'; c.style.filter = 'blur(0)'; }, 400 + i * 120);
+                });
+                
+                t(() => { 
+                    dot.style.opacity = '1'; 
+                    dot.style.transform = 'scale(1.4)';
+                    dot.style.boxShadow = '0 0 20px rgba(217,64,64,0.6)';
+                    t(() => { dot.style.transform = 'scale(1)'; }, 150);
+                    t(() => { dot.style.boxShadow = '0 0 0px transparent'; }, 600);
+                }, 900);
+                
+                t(() => { logo.style.transform = 'scale(1.03)'; t(() => { logo.style.transform = 'scale(1)'; }, 300); }, 1050);
+                
+                // PHASE 3: TAGLINE & PROGRESS
+                t(() => { tag.style.opacity = '1'; tag.style.letterSpacing = '5px'; }, 1100);
+                
+                t(() => { 
+                    pwrap.style.opacity = '1';
+                    
+                    // Progress Fill Animation
+                    let start = performance.now();
+                    function step(now) {
+                        let elapsed = now - start;
+                        if (elapsed > 900) { pfill.style.width = '100%'; return; }
+                        
+                        let progress = 0;
+                        if (elapsed <= 300) progress = (elapsed / 300) * 30; // fast ease-out conceptually
+                        else if (elapsed <= 700) progress = 30 + ((elapsed - 300) / 400) * 45; // medium linear
+                        else progress = 75 + ((elapsed - 700) / 200) * 20; // slow ease-in conceptually
+                        
+                        pfill.style.width = `${progress}%`;
+                        requestAnimationFrame(step);
+                    }
+                    requestAnimationFrame(step);
+                }, 1300);
+                
+                t(() => { cards.forEach(c => { c.style.opacity = '0.6'; }); }, 1400);
+                
+                // PHASE 4: COMPLETION PULSE
+                t(() => {
+                    pwrap.style.opacity = '0';
+                    pglow.style.width = '160px'; pglow.style.height = '160px'; pglow.style.opacity = '1';
+                    t(() => { pglow.style.opacity = '0'; }, 300);
+                    
+                    tag.style.opacity = '0'; tag.style.transform = 'translateY(-10px)';
+                    
+                    logo.style.transform = 'scale(1.08)'; 
+                    dot.style.filter = 'brightness(1.5)';
+                    t(() => { logo.style.transform = 'scale(0.95)'; }, 200);
+                    t(() => { logo.style.transform = 'scale(1)'; dot.style.filter = 'brightness(1)'; }, 400);
+                }, 2200);
+                
+                t(() => {
+                    ripples.forEach((r, i) => {
+                        t(() => {
+                            r.style.opacity = '0.8';
+                            r.style.border = `1px solid rgba(245,239,232,${[0.25, 0.15, 0.08][i]})`;
+                            r.style.transition = 'width 0.7s ease-out, height 0.7s ease-out, opacity 0.7s ease-out';
+                            r.style.width = '300px'; r.style.height = '300px'; r.style.opacity = '0';
+                        }, i * 60);
+                    });
+                }, 2300);
+                
+                // PHASE 5: EXIT SEQUENCE
+                t(() => {
+                    content.style.transform = 'scale(8)';
+                    content.style.filter = 'blur(20px)';
+                    content.style.opacity = '0';
+                    cards.forEach(c => { c.style.opacity = '0'; c.style.transform = 'translateY(-20px)'; });
+                }, 2600);
+                
+                t(() => {
+                    pTop.style.transform = 'translateY(-100%)';
+                    pBot.style.transform = 'translateY(100%)';
+                    
+                    t(() => { flash.style.opacity = '0.15'; t(() => { flash.style.opacity = '0'; }, 250); }, 60);
+                }, 2700);
+                
+                endSequence();
+                
+            })();
+        </script>
+    </div>
+
+    <!-- Custom Cursor -->
+    <div class="cursor-trail-container" id="cursor-trail-container"></div>
+    <div class="cursor-outer" id="cursor-outer"><span class="cursor-text">Click</span></div>
+    <div class="cursor-inner" id="cursor-inner"></div>
+
+    <!-- Section 1: Sticky Nav -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-content">
+            <div class="logo">Wudi<span>.</span></div>
+            <div class="nav-links">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#how-it-works" class="nav-link">How It Works</a>
+                <a href="#team" class="nav-link">Team</a>
+                <a href="#download" class="nav-link">Download</a>
+            </div>
+            <a href="#download" class="btn btn-dark nav-btn">Get Started</a>
+        </div>
+    </nav>
+
+    <!-- Section 2: Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-bg-blob"></div>
+        <div class="hero-bg-dots"></div>
+
+        <div class="hero-content">
+            <div class="hero-left">
+                <div class="badge animate-on-load delay-1">✦ Productivity App</div>
+                <h1 class="hero-title">
+                    <div class="line-wrap"><span class="line animate-clip delay-2">Organize Your Tasks,</span></div>
+                    <div class="line-wrap"><span class="line animate-clip delay-3">Together or <span
+                                class="hover-color-pulse">Alone.</span></span></div>
+                </h1>
+                <p class="hero-sub animate-fade delay-4">
+                    WUDI helps you manage daily tasks, set priorities, and collaborate with your team — all in one
+                    clean, simple app.
+                </p>
+                <div class="hero-actions animate-fade-up delay-5">
+                    <a href="#download" class="btn btn-dark btn-lg hover-arrow-btn">
+                        Download App <span class="arrow-icon">→</span>
+                    </a>
+                    <a href="#how-it-works" class="btn btn-outline btn-lg slide-fill-btn">
+                        See How It Works <span class="arrow-slide">→</span>
+                    </a>
+                </div>
+                <div class="social-proof animate-fade delay-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#E8A838"
+                        stroke="#E8A838" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="margin-right:4px; vertical-align: text-bottom;">
+                        <polygon
+                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg> Trusted by 10,000+ productive users
+                </div>
+            </div>
+
+            <div class="hero-right">
+                <!-- Parallax Wrapper -->
+                <div class="hero-parallax parallax-phone">
+                    <!-- Phone Mockup Container -->
+                    <div class="phone-mockup animate-phone delay-p" id="hero-phone">
+                        <div class="phone-bezel">
+                            <div class="dynamic-island"></div>
+
+                            <!-- WUDI Home Screen Content -->
+                            <div class="screen-content bg-cream">
+                                <div class="screen-header">
+                                    <div class="greeting">Hello, Firas!</div>
+                                    <div class="avatar"></div>
+                                </div>
+
+                                <div class="calendar-strip">
+                                    <div class="cal-day active"><span>Mon</span><strong>12</strong></div>
+                                    <div class="cal-day"><span>Tue</span><strong>13</strong></div>
+                                    <div class="cal-day"><span>Wed</span><strong>14</strong></div>
+                                    <div class="cal-day"><span>Thu</span><strong>15</strong></div>
+                                    <div class="cal-day"><span>Fri</span><strong>16</strong></div>
+                                </div>
+
+                                <div class="section-title">Focus Today</div>
+                                <div class="focus-card">
+                                    <div class="priority-badge high">! High Priority</div>
+                                    <div class="task-name">Finalisasi UI/UX</div>
+                                    <div class="task-time">13:00 - 14:00 PM</div>
+                                </div>
+
+                                <div class="section-title mt-4">Today Task</div>
+                                <div class="task-list">
+                                    <div class="task-item">
+                                        <div class="checkbox"></div>
+                                        <div class="t-info">
+                                            <div class="t-name">Daily Scrum 1</div>
+                                            <div class="t-time">1:00 PM</div>
+                                        </div>
+                                        <div class="priority-badge-sm high">! High</div>
+                                    </div>
+                                    <div class="task-item">
+                                        <div class="checkbox"></div>
+                                        <div class="t-info">
+                                            <div class="t-name">Meeting Client</div>
+                                            <div class="t-time">3:00 PM</div>
+                                        </div>
+                                        <div class="priority-badge-sm med">! Med</div>
+                                    </div>
+                                </div>
+
+                                <div class="fab-btn">+</div>
+                                <div class="bottom-nav">
+                                    <div class="nav-item active">Home</div>
+                                    <div class="nav-item">Calendar</div>
+                                    <div class="nav-item">Teams</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Floating Elements -->
+                    <div class="floating-card card-1 delay-f1">
+                        <div class="f-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                <polyline points="22 4 12 14.01 9 11.01" />
+                            </svg></div>
+                        <div class="f-text">Daily Scrum 2</div>
+                        <div class="f-badge"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"
+                                viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round"
+                                style="margin-right: 4px; vertical-align: middle;">
+                                <circle cx="12" cy="12" r="10" />
+                            </svg> High Priority</div>
+                    </div>
+                    <div class="floating-card card-2 delay-f2">
+                        <div class="f-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+                                <line x1="16" x2="16" y1="2" y2="6" />
+                                <line x1="8" x2="8" y1="2" y2="6" />
+                                <line x1="3" x2="21" y1="10" y2="10" />
+                                <path d="M8 14h.01" />
+                                <path d="M12 14h.01" />
+                                <path d="M16 14h.01" />
+                                <path d="M8 18h.01" />
+                                <path d="M12 18h.01" />
+                                <path d="M16 18h.01" />
+                            </svg></div>
+                        <div class="f-text">Focus Today<br><span>13:00–14:00 PM</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Stats Bar -->
+    <section class="stats-bar scroll-trigger">
+        <div class="stat-item">
+            <div class="stat-num" data-target="10000" data-suffix="K+">0</div>
+            <div class="stat-label">Users</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+            <div class="stat-num" data-target="50000" data-suffix="K+">0</div>
+            <div class="stat-label">Tasks Done</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+            <div class="stat-num" data-target="99" data-suffix="%">0</div>
+            <div class="stat-label">Satisfaction</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+            <div class="stat-num" data-target="2" data-suffix=" Platforms">0</div>
+            <div class="stat-label">iOS & Android</div>
+        </div>
+    </section>
+
+    <!-- Section 4: Features Grid -->
+    <section class="features" id="features">
+        <div class="section-header scroll-trigger">
+            <h2 class="h2-title clip-reveal">Everything You Need to Stay Productive</h2>
+            <p class="sub-title fade-up">WUDI brings personal focus and team collaboration into one seamless experience.
+            </p>
+        </div>
+
+        <div class="features-grid">
+            <!-- Card 1 -->
+            <div class="feature-card scroll-trigger-stagger">
+                <div class="f-icon-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                        <path d="M12 11h4" />
+                        <path d="M12 16h4" />
+                        <path d="M8 11h.01" />
+                        <path d="M8 16h.01" />
+                    </svg>
+                </div>
+                <h3>Personal Task List</h3>
+                <p>Create and organize your daily tasks with custom priorities</p>
+            </div>
+            <!-- Card 2 -->
+            <div class="feature-card scroll-trigger-stagger">
+                <div class="f-icon-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                </div>
+                <h3>Team Collaboration</h3>
+                <p>Invite members, assign tasks, track team progress</p>
+            </div>
+            <!-- Card 3 -->
+            <div class="feature-card scroll-trigger-stagger">
+                <div class="f-icon-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                    </svg>
+                </div>
+                <h3>Priority Levels</h3>
+                <p>Color-coded High, Medium, Low badges keep you focused</p>
+            </div>
+            <!-- Card 4 -->
+            <div class="feature-card scroll-trigger-stagger">
+                <div class="f-icon-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+                        <line x1="16" x2="16" y1="2" y2="6" />
+                        <line x1="8" x2="8" y1="2" y2="6" />
+                        <line x1="3" x2="21" y1="10" y2="10" />
+                        <path d="M8 14h.01" />
+                        <path d="M12 14h.01" />
+                        <path d="M16 14h.01" />
+                        <path d="M8 18h.01" />
+                        <path d="M12 18h.01" />
+                        <path d="M16 18h.01" />
+                    </svg>
+                </div>
+                <h3>Calendar View</h3>
+                <p>See your full week and manage time visually</p>
+            </div>
+            <!-- Card 5 -->
+            <div class="feature-card scroll-trigger-stagger">
+                <div class="f-icon-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                    </svg>
+                </div>
+                <h3>Smart Reminders</h3>
+                <p>Get notified before deadlines sneak up on you</p>
+            </div>
+            <!-- Card 6 -->
+            <div class="feature-card scroll-trigger-stagger">
+                <div class="f-icon-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.3-4.3" />
+                    </svg>
+                </div>
+                <h3>Quick Search</h3>
+                <p>Find any task or team instantly</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 5: How It Works (Zigzag) -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="section-header scroll-trigger">
+            <h2 class="h2-title clip-reveal">Simple. Powerful. Beautiful.</h2>
+            <p class="sub-title fade-up">Three steps to a more productive you.</p>
+        </div>
+
+        <div class="steps-container">
+            <!-- Vertical Line -->
+            <div class="progress-line-container">
+                <div class="progress-line" id="progress-line"></div>
+                <div class="progress-node node-1"></div>
+                <div class="progress-node node-2"></div>
+                <div class="progress-node node-3"></div>
+            </div>
+
+            <!-- Step 1 -->
+            <div class="step-row" id="step-1">
+                <div class="step-text scroll-left">
+                    <div class="step-number">01</div>
+                    <h2>Create Your Account</h2>
+                    <p>Sign up in seconds with just your name, email, and password. Your productivity journey starts
+                        here.</p>
+                </div>
+                <div class="step-phone scroll-right">
+                    <div class="auth-phone-group">
+                        <div class="phone-mockup phone-left parallax-sm">
+                            <div class="phone-bezel">
+                                <div class="dynamic-island"></div>
+                                <div class="screen-content bg-cream" style="padding-top: 20px;">
+                                    <div class="auth-logo">W<span class="udi">udi</span><span class="dot">.</span></div>
+                                    <p class="auth-sub">Sign in to continue your productivity journey with FocusFlow.
+                                    </p>
+
+                                    <div class="auth-inputs">
+                                        <div class="auth-input">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <rect width="20" height="16" x="2" y="4" rx="2" />
+                                                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                                            </svg>
+                                            <span>Enter Your Email</span>
+                                        </div>
+                                        <div class="auth-input">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                                            </svg>
+                                            <span>Enter Your Password</span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round"
+                                                style="margin-left:auto; opacity:0.5;">
+                                                <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                                                <path
+                                                    d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+                                                <path
+                                                    d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+                                                <line x1="2" x2="22" y1="2" y2="22" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="auth-forgot">Forgot Password?</div>
+
+                                    <div class="btn-mockup dark" style="margin-top: 8px;">Login</div>
+                                    <div class="auth-switch">Don't Have An Account? <strong>Sign-Up</strong></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="phone-mockup phone-right parallax-sm">
+                            <div class="phone-bezel">
+                                <div class="dynamic-island"></div>
+                                <div class="screen-content bg-cream" style="padding-top: 20px;">
+                                    <div class="auth-logo">W<span class="udi">udi</span><span class="dot">.</span></div>
+                                    <p class="auth-sub">Start your journey to better productivity with FocusFlow.</p>
+
+                                    <div class="auth-inputs">
+                                        <div class="auth-input">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                                                <circle cx="12" cy="7" r="4" />
+                                            </svg>
+                                            <span>Enter Your Fullname</span>
+                                        </div>
+                                        <div class="auth-input">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <rect width="20" height="16" x="2" y="4" rx="2" />
+                                                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                                            </svg>
+                                            <span>Enter Your Email</span>
+                                        </div>
+                                        <div class="auth-input">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                                            </svg>
+                                            <span>Create Your Password</span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round"
+                                                style="margin-left:auto; opacity:0.5;">
+                                                <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                                                <path
+                                                    d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+                                                <path
+                                                    d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+                                                <line x1="2" x2="22" y1="2" y2="22" />
+                                            </svg>
+                                        </div>
+                                    </div>
+
+                                    <div class="btn-mockup btn-auth-light" style="margin-top: 24px;">Sign-Up</div>
+                                    <div class="auth-switch">Already Have An Account? <strong>Login</strong></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step-row reverse" id="step-2">
+                <div class="step-text scroll-right">
+                    <div class="step-number">02</div>
+                    <h2>Add Tasks & Set Priorities</h2>
+                    <p>Create personal tasks or team tasks. Set due dates, times, and priority levels — High, Medium, or
+                        Low.</p>
+                </div>
+                <div class="step-phone scroll-left">
+                    <div class="phone-mockup parallax-sm">
+                        <div class="phone-bezel">
+                            <div class="dynamic-island"></div>
+                            <div class="screen-content bg-cream">
+                                <div class="screen-header text-center">Create New Task</div>
+                                <div class="input-mockup mt-4 text-left">Task Title</div>
+                                <div class="input-mockup area text-left">Description...</div>
+                                <div class="flex-row">
+                                    <div class="badge-mockup high">! High</div>
+                                    <div class="badge-mockup med">! Med</div>
+                                    <div class="badge-mockup low">! Low</div>
+                                </div>
+                                <div class="btn-mockup mt-4">Create Task</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step-row" id="step-3">
+                <div class="step-text scroll-left">
+                    <div class="step-number">03</div>
+                    <h2>Collaborate with Your Team</h2>
+                    <p>Invite members to your project team, assign tasks, track progress bars, and achieve goals
+                        together.</p>
+                </div>
+                <div class="step-phone scroll-right">
+                    <div class="phone-mockup parallax-sm">
+                        <div class="phone-bezel">
+                            <div class="dynamic-island"></div>
+                            <div class="screen-content bg-cream">
+                                <div class="screen-header text-center">Project Team</div>
+                                <div class="team-card">
+                                    <div class="t-name">Design Team</div>
+                                    <div class="progress-bar-mockup">
+                                        <div class="fill" style="width: 75%"></div>
+                                    </div>
+                                </div>
+                                <div class="team-card">
+                                    <div class="t-name">Dev Squad</div>
+                                    <div class="progress-bar-mockup">
+                                        <div class="fill" style="width: 32%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 6: Dark Feature Highlight -->
+    <section class="dark-feature">
+        <div class="bg-circles">
+            <div class="circle-right"></div>
+            <div class="circle-left"></div>
+        </div>
+
+        <div class="df-content">
+            <div class="df-left">
+                <div class="badge-outline scroll-fade">✦ Task Detail</div>
+                <h2 class="h2-white scroll-clip">Know exactly what to do, and when.</h2>
+                <p class="df-body scroll-up">Tap any task to see full details — priority level, time, description, and
+                    quick actions to delete or edit.</p>
+
+                <ul class="checkpoints">
+                    <li class="scroll-left-stagger"><span class="check">✓</span> View task priority and scheduled time
+                    </li>
+                    <li class="scroll-left-stagger"><span class="check">✓</span> Read full task description</li>
+                    <li class="scroll-left-stagger"><span class="check">✓</span> Delete or edit tasks instantly</li>
+                </ul>
+
+                <a href="#download" class="btn btn-white btn-lg mt-4 scroll-scale">Try It Free →</a>
+            </div>
+
+            <div class="df-right phone-group">
+                <!-- Phone 1: Today Task -->
+                <div class="phone-mockup phone-left scroll-up-delay-1">
+                    <div class="phone-bezel dark-mode">
+                        <div class="dynamic-island"></div>
+                        <div class="screen-content bg-dark">
+                            <div class="screen-header text-left" style="font-size: 20px;">Today Task</div>
+                            <div class="task-list mt-4">
+                                <div class="task-item dark">
+                                    <div class="checkbox"></div>
+                                    <div class="t-info">
+                                        <div class="t-name">Scrum 2</div>
+                                    </div>
+                                </div>
+                                <div class="task-item dark">
+                                    <div class="checkbox"></div>
+                                    <div class="t-info">
+                                        <div class="t-name">UI/UX</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phone 2: Task Detail -->
+                <div class="phone-mockup phone-right scroll-up-delay-2">
+                    <div class="phone-bezel">
+                        <div class="dynamic-island"></div>
+                        <div class="screen-content bg-cream popup-mockup">
+                            <h3 class="popup-title">Daily Scrum 2</h3>
+
+                            <div class="priority-box">
+                                <span>! High Priority</span>
+                            </div>
+
+                            <div class="time-mockup">1:00 PM</div>
+                            <p class="desc-mockup">Meet bersama team melalui zoom membahas blabla...</p>
+
+                            <div class="flex-row bottom-actions">
+                                <div class="btn-mockup red" style="margin-top: 0;">Delete</div>
+                                <div class="btn-mockup dark" style="margin-top: 0;">Edit</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 7: Team Highlight -->
+    <section class="team-highlight" id="team">
+        <div class="section-header scroll-trigger">
+            <h2 class="h2-title clip-words">Built for Teams, Designed for Individuals.</h2>
+            <p class="sub-title fade-up">Whether flying solo or leading a squad, WUDI adapts to you.</p>
+        </div>
+
+        <div class="large-phone-container scroll-trigger">
+            <div class="phone-mockup large-phone">
+                <div class="phone-bezel">
+                    <div class="dynamic-island"></div>
+                    <div class="screen-content bg-cream">
+                        <div class="screen-header text-center">Project Team</div>
+                        <div class="invitation-card mt-2">
+                            <div class="t-name">Marketing Strategy</div>
+                            <div class="flex-row">
+                                <div class="btn-mockup sm outline">Decline</div>
+                                <div class="btn-mockup sm dark">Accept</div>
+                            </div>
+                        </div>
+                        <div class="team-card mt-4">
+                            <div class="t-name">Design Team</div>
+                            <div class="progress-bar-mockup">
+                                <div class="fill" style="width: 75%"></div>
+                            </div>
+                            <div class="avatars-overlap mt-2">
+                                <div class="av"></div>
+                                <div class="av"></div>
+                                <div class="av"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-pills">
+                <div class="pill scroll-up-stagger" style="display:flex;align-items:center;"><svg
+                        xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="#5BAD72" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                        style="margin-right:8px;">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                        <polyline points="22 4 12 14.01 9 11.01" />
+                    </svg> Invite Members</div>
+                <div class="pill scroll-up-stagger" style="display:flex;align-items:center;"><svg
+                        xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="margin-right:8px;">
+                        <path d="M3 3v18h18" />
+                        <rect width="4" height="7" x="7" y="10" rx="1" />
+                        <rect width="4" height="12" x="15" y="5" rx="1" />
+                    </svg> Track Progress</div>
+                <div class="pill scroll-up-stagger" style="display:flex;align-items:center;"><svg
+                        xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="margin-right:8px;">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                    </svg> Project Teams</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 8: Testimonials -->
+    <section class="testimonials">
+        <div class="section-header scroll-trigger">
+            <h2 class="h2-title clip-reveal">Loved by productive people</h2>
+        </div>
+
+        <div class="testi-grid">
+            <div class="testi-card scroll-trigger-stagger">
+                <div class="stars">★★★★★</div>
+                <p class="quote">"WUDI completely changed how I manage my daily tasks. The priority system is a game
+                    changer!"</p>
+                <div class="author">
+                    <div class="av"></div>
+                    <div class="a-info">
+                        <strong>Firas A.</strong>
+                        <span>Product Manager</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testi-card scroll-trigger-stagger">
+                <div class="stars">★★★★★</div>
+                <p class="quote">"Finally an app that lets me collaborate with my team AND manage personal tasks in one
+                    place."</p>
+                <div class="author">
+                    <div class="av"></div>
+                    <div class="a-info">
+                        <strong>Aqila R.</strong>
+                        <span>UI/UX Designer</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testi-card scroll-trigger-stagger">
+                <div class="stars">★★★★★</div>
+                <p class="quote">"The interface is so clean and warm. I actually enjoy opening my to-do list now!"</p>
+                <div class="author">
+                    <div class="av"></div>
+                    <div class="a-info">
+                        <strong>Rafi M.</strong>
+                        <span>Software Developer</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 9: CTA -->
+    <section class="cta-section" id="download">
+        <div class="cta-bg-cards">
+            <div class="abstract-card c1"></div>
+            <div class="abstract-card c2"></div>
+            <div class="abstract-card c3"></div>
+            <div class="abstract-card c4"></div>
+            <div class="abstract-card c5"></div>
+        </div>
+
+        <div class="cta-content scroll-trigger">
+            <div class="logo-huge scroll-scale">Wudi<span>.</span></div>
+            <h2 class="h2-white clip-reveal">Start Getting Things Done — Today.</h2>
+            <p class="cta-body fade-up">Download WUDI for free and take control of your tasks and teams.</p>
+
+            <div class="cta-buttons flex-row fade-up-stagger">
+                <a href="https://play.google.com/store/apps/details?id=com.pdbl.wudi&pcampaignid=web_share"
+                    target="_blank" rel="noopener noreferrer" class="btn btn-white btn-lg hover-glow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="margin-right:8px;">
+                        <polygon points="5 3 19 12 5 21 5 3" />
+                    </svg>
+                    Google Play
+                </a>
+            </div>
+
+            <p class="cta-small fade-up">Free to download. No credit card required.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer scroll-trigger">
+        <div class="footer-top">
+            <div class="f-left">
+                <div class="logo">Wudi<span>.</span></div>
+                <p>Organize Your Tasks,<br>Together or Alone.</p>
+            </div>
+            <div class="f-right">
+                <div class="f-col fade-up-stagger">
+                    <strong>Product</strong>
+                    <a href="#features">Features</a>
+                    <a href="#how-it-works">How It Works</a>
+                    <a href="#download">Download</a>
+                </div>
+                <div class="f-col fade-up-stagger">
+                    <strong>Company</strong>
+                    <a href="#">About Us</a>
+                    <a href="#">Careers</a>
+                    <a href="#">Contact</a>
+                </div>
+                <div class="f-col fade-up-stagger">
+                    <strong>Legal</strong>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 WUDI. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
