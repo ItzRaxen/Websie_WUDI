@@ -25,6 +25,19 @@ document.addEventListener('DOMContentLoaded', () => {
             trails.push({ element: dot, x: mouseX, y: mouseY, opacity: 0 });
         }
         
+        // Hero Parallax Setup
+        const heroParallax = document.querySelector('.hero-parallax');
+        const heroPhone = document.getElementById('hero-phone');
+        let hpRotX = 0;
+        let hpRotY = 0;
+        let hpScale = 1;
+        let hpTargetScale = 1;
+        
+        if (heroPhone) {
+            heroPhone.addEventListener('mouseenter', () => { hpTargetScale = 1.04; });
+            heroPhone.addEventListener('mouseleave', () => { hpTargetScale = 1; });
+        }
+
         window.addEventListener('mousemove', (e) => {
             mouseX = e.clientX;
             mouseY = e.clientY;
@@ -73,7 +86,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 prevX = trail.x;
                 prevY = trail.y;
             });
-            
+            // Hero Parallax Logic
+            if (heroParallax) {
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+                // Maximum rotation of roughly 12 degrees
+                const targetRotY = ((mouseX - centerX) / centerX) * 12; 
+                const targetRotX = -((mouseY - centerY) / centerY) * 12;
+                
+                hpRotX = lerp(hpRotX, targetRotX, 0.05);
+                hpRotY = lerp(hpRotY, targetRotY, 0.05);
+                hpScale = lerp(hpScale, hpTargetScale, 0.08);
+                
+                heroParallax.style.transform = `perspective(1000px) rotateX(${hpRotX}deg) rotateY(${hpRotY}deg) scale(${hpScale})`;
+            }
+
             requestAnimationFrame(renderCursor);
         };
         requestAnimationFrame(renderCursor);
