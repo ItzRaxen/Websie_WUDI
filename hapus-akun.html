@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hapus Akun | Wudi.</title>
+    <meta
+      name="description"
+      content="Cara menghapus akun dan data Wudi kamu secara permanen."
+    />
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+
+    <style>
+      body {
+        background-color: var(--bg-primary);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 40px 20px;
+        margin: 0;
+        overflow-x: hidden;
+      }
+      .delete-container {
+        width: 100%;
+        max-width: 500px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        z-index: 2;
+      }
+      .logo-container {
+        font-size: 40px;
+        font-weight: 700;
+        color: var(--bg-dark);
+        margin-bottom: 24px;
+        text-decoration: none;
+      }
+      .logo-container span {
+        color: var(--accent-red);
+      }
+      .delete-card {
+        background-color: var(--white);
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: var(--shadow-soft);
+        width: 100%;
+        text-align: center;
+      }
+      .icon-alert {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background-color: rgba(217, 64, 64, 0.1);
+        color: var(--accent-red);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+      }
+      .delete-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+      }
+      .delete-subtitle {
+        font-size: 14px;
+        color: var(--text-secondary);
+        margin-bottom: 24px;
+      }
+      .warning-box {
+        background-color: rgba(217, 64, 64, 0.08);
+        border: 1px solid rgba(217, 64, 64, 0.2);
+        color: var(--accent-red);
+        padding: 16px;
+        border-radius: 12px;
+        font-size: 13px;
+        text-align: left;
+        margin-bottom: 32px;
+        line-height: 1.6;
+      }
+      .warning-box strong {
+        font-weight: 700;
+      }
+      .step-list {
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin-bottom: 40px;
+      }
+      .step-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+      }
+      .step-number-circle {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background-color: var(--bg-dark);
+        color: var(--white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+      .step-text {
+        font-size: 14px;
+        color: var(--text-primary);
+        line-height: 1.6;
+      }
+      .support-link {
+        font-size: 13px;
+        color: var(--text-secondary);
+      }
+      .support-link a {
+        color: var(--bg-dark);
+        font-weight: 600;
+        text-decoration: underline;
+      }
+      .back-link {
+        margin-top: 24px;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: color 0.3s;
+        text-decoration: none;
+      }
+      .back-link:hover {
+        color: var(--bg-dark);
+      }
+      @media (max-width: 480px) {
+        .delete-card {
+          padding: 32px 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="delete-container">
+      <a href="index.html" class="logo-container">Wudi<span>.</span></a>
+
+      <div class="delete-card">
+        <div class="icon-alert">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"
+            ></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </div>
+
+        <h1 class="delete-title">Hapus Akun</h1>
+        <p class="delete-subtitle">Cara Menghapus Akun dan Data Wudi Kamu</p>
+
+        <div class="warning-box">
+          Tindakan ini permanen, lho. Kalau lanjut, semua data tugas, jadwal,
+          dan kolaborasi timmu bakal
+          <strong>dihapus dan nggak bisa balik lagi.</strong> Yakin mau pamit?
+        </div>
+
+        <div class="step-list">
+          <div class="step-item">
+            <div class="step-number-circle">1</div>
+            <div class="step-text">Buka aplikasi email favorit kamu.</div>
+          </div>
+          <div class="step-item">
+            <div class="step-number-circle">2</div>
+            <div class="step-text">
+              Kirim email ke <strong>wudipdbl@gmail.com</strong> dengan subjek
+              "Permintaan Hapus Akun".
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-number-circle">3</div>
+            <div class="step-text">
+              Jangan lupa tulis email yang kamu pakai di aplikasi Wudi, ya!
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-number-circle">4</div>
+            <div class="step-text">
+              Beres! Tim kami bakal bantu hapus semua data dan akunmu dalam
+              waktu maksimal 1x24 jam.
+            </div>
+          </div>
+        </div>
+
+        <div class="support-link">
+          Butuh bantuan? <a href="mailto:wudipdbl@gmail.com">Hubungi tim kami</a>
+        </div>
+      </div>
+
+      <a href="index.html" class="back-link">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Kembali ke Beranda
+      </a>
+    </div>
+
+    <!-- Custom Cursor -->
+    <div class="cursor-outer" id="cursor-outer"></div>
+    <div class="cursor-inner" id="cursor-inner"></div>
+
+    <script>
+      // Custom Cursor Logic
+      const cursorOuter = document.getElementById("cursor-outer");
+      const cursorInner = document.getElementById("cursor-inner");
+
+      window.addEventListener("mousemove", (e) => {
+        cursorOuter.style.transform = `translate(${e.clientX - 20}px, ${e.clientY - 20}px)`;
+        cursorInner.style.transform = `translate(${e.clientX - 3}px, ${e.clientY - 3}px)`;
+      });
+
+      const interactables = document.querySelectorAll("a, button");
+      interactables.forEach((el) => {
+        el.addEventListener("mouseenter", () => {
+          document.body.classList.add("cursor-hover-btn");
+        });
+        el.addEventListener("mouseleave", () => {
+          document.body.classList.remove("cursor-hover-btn");
+        });
+      });
+    </script>
+  </body>
+</html>
